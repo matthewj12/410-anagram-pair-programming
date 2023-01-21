@@ -11,7 +11,9 @@ import javax.swing.JLabel;
 import java.awt.Insets;
 import javax.swing.JButton;
 import javax.swing.JTextArea;
-import java.awt.event.*;  
+import java.awt.event.*;
+import java.io.IOException;
+import java.util.ArrayList;
 
 public class AnagramGUI extends JFrame {
 
@@ -35,6 +37,23 @@ public class AnagramGUI extends JFrame {
 		});
 	}
 
+	public String formatAnagramsForPrinting(ArrayList<ArrayList<String>> allAnagrams) {
+		String toReturn = "";
+
+		for (ArrayList<String> anagrams : allAnagrams) {
+			toReturn += anagrams.get(0);
+
+			for (int i = 1; i < anagrams.size(); i++) {
+				toReturn += ", " + anagrams.get(i);
+			}
+
+			toReturn += "\n";
+		}
+
+		return toReturn;
+	}
+
+
 	/**
 	 * Create the frame.
 	 */
@@ -57,7 +76,7 @@ public class AnagramGUI extends JFrame {
 		gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
 		panel.setLayout(gbl_panel);
 		
-		JLabel lblPath = new JLabel("Enter path");
+		JLabel lblPath = new JLabel("Enter the path to the text file to analyze:");
 		GridBagConstraints gbc_lblPath = new GridBagConstraints();
 		gbc_lblPath.insets = new Insets(0, 0, 5, 5);
 		gbc_lblPath.gridx = 0;
@@ -91,13 +110,24 @@ public class AnagramGUI extends JFrame {
 		gbc_textAnswer.gridx = 0;
 		gbc_textAnswer.gridy = 3;
 		panel.add(textAnswer, gbc_textAnswer);
+
 		// allows the enter button to add text to the textAnswer field
-	    btnEnter.addActionListener(new ActionListener(){  
-	    	public void actionPerformed(ActionEvent e){  
-	    				String path = textPath.getText(); //gets the text from the path field
-	    	            textAnswer.setText(path);  
-	    	        }  
-	    	    }); 
+		btnEnter.addActionListener(new ActionListener() {  
+			public void actionPerformed(ActionEvent e) {  
+				String path = textPath.getText(); //gets the text from the path field
+				ArrayList<ArrayList<String>> anagrams = new ArrayList<ArrayList<String>>();
+
+				try {
+					anagrams = AnagramFinder.findAnagrams(path);
+				}
+				catch (IOException p) {
+					p.printStackTrace();
+				}
+
+				String output = formatAnagramsForPrinting(anagrams);
+				textAnswer.setText(output);
+			}  
+		}); 
 	}
 	
 }
